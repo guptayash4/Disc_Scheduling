@@ -1,0 +1,231 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define REQMAX 100
+
+int n, cylinders, currentReq, previousReq, requests[REQMAX], sortedReq[REQMAX], totCylinders;
+
+void copyAndSort() {
+    int i,j,temp;
+    for(i=0;i<n;i++)
+        sortedReq[i] = requests[i];
+    for(i=0;i<n-1;i++)
+        for(j=0;j<n-i-1;j++)
+            if(sortedReq[j]>sortedReq[j+1])
+                temp=sortedReq[j],sortedReq[j]=sortedReq[j+1],sortedReq[j+1]=temp;
+}
+
+void FCFS() {
+    totCylinders=0;
+    int i;
+    printf("\n %d --> %d",currentReq,requests[0]);
+    totCylinders += abs(requests[0]-currentReq);
+    for(i=1;i<n;i++) {
+        printf(" --> %d",requests[i]);
+        totCylinders += abs(requests[i]-requests[i-1]);
+    }
+    printf("\n Total Distance:- %d \n",totCylinders);
+}
+
+void SSTF() {
+    totCylinders=0;
+    int i,j,min=cylinders,head=currentReq,pos,marked[REQMAX];
+    for(i=0;i<n;i++)
+        marked[i]=0;
+    for(i=0;i<n;i++)
+        if(abs(head-requests[i])<min)
+            min=abs(head-requests[i]),pos=i;
+    printf("\n %d --> %d",currentReq,requests[pos]);
+    totCylinders += abs(head-requests[pos]);
+    head = requests[pos];
+    marked[pos]=1;
+    for(i=1;i<n;i++) {
+        min=cylinders;
+        for(j=0;j<n;j++)
+            if(!marked[j]&&abs(head-requests[j])<min)
+                min=abs(head-requests[j]),pos=j;
+        printf(" --> %d",requests[pos]);
+        totCylinders += abs(head-requests[pos]);
+        head = requests[pos];
+        marked[pos]=1;
+    }
+    printf("\n Total Distance:- %d \n",totCylinders);
+}
+
+void SCAN() {
+    totCylinders=0;
+    int i,pos,direction;
+    if(currentReq>previousReq)
+        direction=1;
+    else
+        direction=-1;
+    for(i=0;currentReq>sortedReq[i];i++);
+    if(direction==1) {
+        pos=i-1;
+        printf("\n %d --> %d",currentReq,sortedReq[i]);
+        totCylinders += abs(sortedReq[i]-currentReq);
+        i++;
+        while(i<n) {
+            printf(" --> %d",sortedReq[i]);
+            totCylinders += abs(sortedReq[i]-sortedReq[i-1]);
+            i++;
+        }
+        printf(" --> %d --> %d",cylinders-1,sortedReq[pos]);
+        totCylinders += abs(cylinders-1-sortedReq[i-1]) + abs(cylinders-1-sortedReq[pos]);
+        i=pos-1;
+        while(i>=0) {
+            printf(" --> %d",sortedReq[i]);
+            totCylinders += abs(sortedReq[i]-sortedReq[i+1]);
+            i--;
+        }
+    }
+    else {
+        pos=i;
+        printf("\n %d --> %d",currentReq,sortedReq[i-1]);
+        totCylinders += abs(sortedReq[i-1]-currentReq);
+        i=i-2;
+        while(i>=0) {
+            printf(" --> %d",sortedReq[i]);
+            totCylinders += abs(sortedReq[i]-sortedReq[i+1]);
+            i--;
+        }
+        printf(" --> %d --> %d",0,sortedReq[pos]);
+        totCylinders += sortedReq[i+1] + sortedReq[pos];
+        i=pos+1;
+        while(i<n) {
+            printf(" --> %d",sortedReq[i]);
+            totCylinders += abs(sortedReq[i]-sortedReq[i-1]);
+            i++;
+        }
+    }
+    printf("\n Total Distance:- %d \n",totCylinders);
+}
+
+void LOOK() {
+    totCylinders=0;
+    int i,pos,direction;
+    if(currentReq>previousReq)
+        direction=1;
+    else
+        direction=-1;
+    for(i=0;currentReq>sortedReq[i];i++);
+    if(direction==1) {
+        pos=i-1;
+        printf("\n %d --> %d",currentReq,sortedReq[i]);
+        totCylinders += abs(sortedReq[i]-currentReq);
+        i++;
+        while(i<n) {
+            printf(" --> %d",sortedReq[i]);
+            totCylinders += abs(sortedReq[i]-sortedReq[i-1]);
+            i++;
+        }
+        printf(" --> %d",sortedReq[pos]);
+        totCylinders += abs(sortedReq[pos]-sortedReq[i-1]);
+        i=pos-1;
+        while(i>=0) {
+            printf(" --> %d",sortedReq[i]);
+            totCylinders += abs(sortedReq[i]-sortedReq[i+1]);
+            i--;
+        }
+    }
+    else {
+        pos=i;
+        printf("\n %d --> %d",currentReq,sortedReq[i-1]);
+        totCylinders += abs(sortedReq[i-1]-currentReq);
+        i=i-2;
+        while(i>=0) {
+            printf(" --> %d",sortedReq[i]);
+            totCylinders += abs(sortedReq[i]-sortedReq[i+1]);
+            i--;
+        }
+        printf(" --> %d",sortedReq[pos]);
+        totCylinders += abs(sortedReq[i+1]-sortedReq[pos]);
+        i=pos+1;
+        while(i<n) {
+            printf(" --> %d",sortedReq[i]);
+            totCylinders += abs(sortedReq[i]-sortedReq[i-1]);
+            i++;
+        }
+    }
+    printf("\n Total Distance:- %d \n",totCylinders);
+}
+
+void CSCAN() {
+    totCylinders=0;
+    int i,pos,direction;
+    if(currentReq>previousReq)
+        direction=1;
+    else
+        direction=-1;
+    for(i=0;currentReq>sortedReq[i];i++);
+    if(direction==1) {
+        pos=i-1;
+        printf("\n %d --> %d",currentReq,sortedReq[i]);
+        totCylinders += abs(sortedReq[i]-currentReq);
+        i++;
+        while(i<n) {
+            printf(" --> %d",sortedReq[i]);
+            totCylinders += abs(sortedReq[i]-sortedReq[i-1]);
+            i++;
+        }
+        printf(" --> %d --> %d --> %d",cylinders-1,0,sortedReq[0]);
+        totCylinders += abs(cylinders-1-sortedReq[i-1]) + 1 + sortedReq[0];
+        i=1;
+        while(i<=pos) {
+            printf(" --> %d",sortedReq[i]);
+            totCylinders += abs(sortedReq[i]-sortedReq[i-1]);
+            i++;
+        }
+    }
+    else {
+        pos=i;
+        printf("\n %d --> %d",currentReq,sortedReq[i-1]);
+        totCylinders += abs(sortedReq[i-1]-currentReq);
+        i=i-2;
+        while(i>=0) {
+            printf(" --> %d",sortedReq[i]);
+            totCylinders += abs(sortedReq[i]-sortedReq[i+1]);
+            i--;
+        }
+        printf(" --> %d --> %d --> %d",0,cylinders-1,sortedReq[n-1]);
+        totCylinders += sortedReq[0] + 1 + abs(cylinders-1-sortedReq[n-1]);
+        i=n-2;
+        while(i>=pos) {
+            printf(" --> %d",sortedReq[i]);
+            totCylinders += abs(sortedReq[i]-sortedReq[i+1]);
+            i--;
+        }
+    }
+    printf("\n Total Distance:- %d \n",totCylinders);
+}
+
+int main() {
+    int i;
+    printf("\n Enter the number of cylinders:- ");
+    scanf("%d",&cylinders);
+    printf("\n Which is the current request being serviced:- ");
+    scanf("%d",&currentReq);
+    printf("\n Which was the previous request serviced:- ");
+    scanf("%d",&previousReq);
+    printf("\n Enter the number of waiting requests:- ");
+    scanf("%d",&n);
+    printf("\n Enter the list of waiting requests:- ");
+    for(i=0;i<n;i++)
+        scanf("%d",&requests[i]);
+    copyAndSort();
+    printf("\n Disk Scheduling Algorithms:-");
+    printf("\n \t1.FCFS\n \t2.SSTF\n \t3.SCAN\n \t4.LOOK\n \t5.C-SCAN or C-LOOK\n");
+    while(1) {
+        printf("\n \t\tChoose an algorithm (6. Exit):- ");
+        scanf("%d",&i);
+        switch(i) {
+        case 1:     FCFS();     break;
+        case 2:     SSTF();     break;
+        case 3:     SCAN();     break;
+        case 4:     LOOK();     break;
+        case 5:     CSCAN();    break;
+        default:    return 0;
+        }
+    }
+    return 0;
+}
